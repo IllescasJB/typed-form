@@ -1,0 +1,121 @@
+<form [formGroup]="taskForm" (submit)="submit()">
+  <mat-card class="m-10">
+    <mat-card-title>Create task (Typed Form)</mat-card-title>
+    <mat-divider inset="false"></mat-divider>
+    <mat-card-content>
+      <div class="grid grid-cols-2 gap-x-4 gap-y-2 pt-4">
+        <div class="col-span-2 flex flex-row w-full">
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Task name</mat-label>
+            <input formControlName="name" matInput required>
+            <mat-error *ngIf="name.invalid">{{getErrorMessage(name)}}</mat-error>
+          </mat-form-field>
+        </div>
+        <div class="flex flex-row w-full">
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Select me</mat-label>
+            <mat-select formControlName="select" required>
+              <mat-option [value]="1">Option 1</mat-option>
+              <mat-option [value]="2">Option 2</mat-option>
+              <mat-option [value]="3">Option 3</mat-option>
+            </mat-select>
+            <mat-error *ngIf="select.invalid">{{getErrorMessage(select)}}</mat-error>
+          </mat-form-field>
+        </div>
+        <div class="flex flex-row w-full">
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Select me</mat-label>
+            <mat-select formControlName="selectMulti" multiple required>
+              <mat-select-trigger>
+                {{selectMulti.value ? selectMulti.value[0] : ''}}
+                <span *ngIf="selectMulti.value.length > 1">
+                  (+{{selectMulti.value.length - 1}} {{selectMulti.value.length === 2 ? 'other' : 'others'}})
+                </span>
+              </mat-select-trigger>
+              <mat-option *ngFor="let value of multiValues" [value]="value">{{value}}</mat-option>
+            </mat-select>
+            <mat-error *ngIf="selectMulti.invalid">{{getErrorMessage(selectMulti)}}</mat-error>
+          </mat-form-field>
+        </div>
+        <div class="col-span-2 flex flex-row w-full">
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Comments</mat-label>
+            <textarea formControlName="comments" matInput rows="5" #text maxlength="100"></textarea>
+            <mat-hint align="end">{{text.value.length}} / 100</mat-hint>
+            <mat-error *ngIf="comments.invalid">{{getErrorMessage(comments)}}</mat-error>
+          </mat-form-field>
+        </div>
+        <div class="flex flex-row w-full">
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>CC</mat-label>
+            <input formControlName="cc" matInput>
+            <mat-hint align="start">Optional</mat-hint>
+            <mat-error *ngIf="cc.invalid">{{getErrorMessage(cc)}}</mat-error>
+          </mat-form-field>
+        </div>
+        <div class="flex flex-row w-full">
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Choose a date</mat-label>
+            <input formControlName="date" matInput [matDatepicker]="picker">
+            <mat-hint>DD/MM/YYYY</mat-hint>
+            <mat-error *ngIf="date.invalid">{{getErrorMessage(date)}}</mat-error>
+            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-datepicker #picker></mat-datepicker>
+          </mat-form-field>
+        </div>
+        <div class="col-span-2 flex flex-row w-full">
+          <div class="w-1/2 text-start">
+            <span>Nature of request</span>
+          </div>
+          <div class="w-1/2 text-start">
+            <span>Current reviewable status</span>
+          </div>
+        </div>
+        <div class="col-span-2 flex flex-row w-full">
+          <div class="flex flex-col gap-y-2 w-1/2" formGroupName="natureRequest">
+            <mat-checkbox formControlName="adds">Ads review</mat-checkbox>
+            <mat-checkbox formControlName="keywords">Keywords review</mat-checkbox>
+            <mat-checkbox formControlName="extensions">Extension review</mat-checkbox>
+          </div>
+          <mat-radio-group class="flex flex-col gap-y-2 w-1/2" formControlName="reviewableStatus">
+            <mat-radio-button value="1" checked>Approved</mat-radio-button>
+            <mat-radio-button value="2">Not approved</mat-radio-button>
+          </mat-radio-group>
+        </div>
+        <div class="col-span-2 flex flex-row items-center gap-x-4 w-full">
+          <mat-card-title-group>Create Subtask</mat-card-title-group>
+          <button matTooltip="Add new Subtask" type="button" mat-mini-fab color="primary" [disabled]="loading"
+            (click)="addNewSubtasks()">
+            <mat-icon>add</mat-icon>
+          </button>
+        </div>
+        <div class="col-span-2 flex flex-col w-full">
+          <ng-container *ngFor="let subTaskForm of subtasks.controls; let i = index">
+            <mat-form-field appearance="outline" class="w-full" [@fadeIn]="'in'">
+              <mat-label>Subtask name {{ i + 1 }}</mat-label>
+              <input [formControl]="subTaskForm.controls.name" matInput required>
+              <button matSuffix mat-icon-button matTooltip="Remove Subtask" type="button" [disabled]="loading"
+                (click)="removeSubtask(i)">
+                <mat-icon>delete</mat-icon>
+              </button>
+              <mat-error *ngIf="subTaskForm.controls.name.invalid">{{getErrorMessage(name)}}</mat-error>
+            </mat-form-field>
+            <mat-form-field appearance="outline" class="w-full" [@fadeIn]="'in'">
+              <mat-label>Comments</mat-label>
+              <textarea [formControl]="subTaskForm.controls.comments" matInput rows="3" #text
+                maxlength="100"></textarea>
+              <mat-hint align="end">{{text.value.length}} / 100</mat-hint>
+              <mat-error *ngIf="subTaskForm.controls.comments.invalid">{{getErrorMessage(comments)}}</mat-error>
+            </mat-form-field>
+          </ng-container>
+        </div>
+      </div>
+    </mat-card-content>
+    <mat-card-actions align="end">
+      <button mat-raised-button color="primary" class="w-40" type="submit" [disabled]="loading">Submit</button>
+    </mat-card-actions>
+    <mat-card-footer *ngIf="loading">
+      <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+    </mat-card-footer>
+  </mat-card>
+</form>
